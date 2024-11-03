@@ -42,6 +42,9 @@ architecture rtl of elevator_ctrl is
   signal request_valid       : std_logic;
   signal suggested_direction : std_logic;
   signal enable              : std_logic;
+  -- FIX: those ared added for can't read an output error in compile
+  signal moving_up_reg       : std_logic;
+  signal moving_down_reg     : std_logic;
 
   -- components
   component request_resolver is
@@ -59,7 +62,7 @@ architecture rtl of elevator_ctrl is
           is_idle           : in  std_logic;
           target_floor      : out unsigned(FLOOR_BITS-1 downto 0);
           request_valid     : out std_logic;
-          suggested_dir_up  : out std_logic
+          suggest_direction : out std_logic
       );
   end component;
 
@@ -96,12 +99,12 @@ begin
           rst => rst,
           floor_request => floor_request,
           current_floor => current_floor_reg,
-          moving_up => moving_up,
-          moving_down => moving_down,
+          moving_up => moving_up_reg,
+          moving_down => moving_down_reg,
           is_idle => is_idle,
           target_floor => target_floor_reg,
           request_valid => request_valid,
-          suggested_dir_up => suggested_direction
+          suggest_direction =>  suggested_direction
       );
 
   -- state machine
@@ -158,8 +161,8 @@ begin
   process(current_state, request_valid, suggested_direction, current_floor_reg, target_floor_reg, move_timer, door_timer)
   begin
     next_state <= current_state;
-    moving_up <= '0';
-    moving_down <= '0';
+    moving_up_reg <= '0';
+    moving_down_reg <= '0';
     door_open <= '0';
     is_idle <= '0';
 
@@ -171,7 +174,7 @@ begin
         end if;
 
       when S_CHECK_REQUESTS =>
-        if not request_valid then
+        if request_valid = '0' then
           next_state <= S_IDLE;
         elsif current_floor_reg = target_floor_reg then
           next_state <= S_DOOR_OPENING;
@@ -182,13 +185,13 @@ begin
         end if;
 
       when S_MOVING_UP =>
-        moving_up <= '1';
+        moving_up_reg <= '1';
         if move_timer = 0 then
           next_state <= S_CHECK_REQUESTS;
         end if;
 
       when S_MOVING_DOWN =>
-        moving_down <= '1';
+        moving_down_reg <= '1';
         if move_timer = 0 then
           next_state <= S_CHECK_REQUESTS;
         end if;
@@ -212,5 +215,7 @@ begin
 
   -- output logic
   current_floor <= current_floor_reg;
+  moving_up <= moving_up_reg;
+  moving_down <= moving_down_reg;
 
 end architecture rtl;
