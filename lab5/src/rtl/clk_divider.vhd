@@ -4,7 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity clock_divider is
   generic (
-    CLK_FREQ      : integer := 50_000_000
+    CLK_FREQ      : integer := 50
   );
   port (
     clk           : in  std_logic;

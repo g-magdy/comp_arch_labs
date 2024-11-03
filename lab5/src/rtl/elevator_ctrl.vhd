@@ -6,7 +6,7 @@ entity elevator_ctrl is
   generic(
     NUM_FLOORS  : integer := 10;
     FLOOR_BITS  : integer := 4;
-    CLK_FREQ    : integer := 50_000_000
+    CLK_FREQ    : integer := 50
   );
   port(
     clk           : in  std_logic;
@@ -42,9 +42,12 @@ architecture rtl of elevator_ctrl is
   signal request_valid       : std_logic;
   signal suggested_direction : std_logic;
   signal enable              : std_logic;
+  signal request_done : std_logic;
   -- FIX: those ared added for can't read an output error in compile
   signal moving_up_reg       : std_logic;
   signal moving_down_reg     : std_logic;
+
+
 
   -- components
   component request_resolver is
@@ -60,6 +63,7 @@ architecture rtl of elevator_ctrl is
           moving_up         : in  std_logic;
           moving_down       : in  std_logic;
           is_idle           : in  std_logic;
+          request_done      : in  std_logic;
           target_floor      : out unsigned(FLOOR_BITS-1 downto 0);
           request_valid     : out std_logic;
           suggest_direction : out std_logic
@@ -102,6 +106,7 @@ begin
           moving_up => moving_up_reg,
           moving_down => moving_down_reg,
           is_idle => is_idle,
+          request_done => request_done,
           target_floor => target_floor_reg,
           request_valid => request_valid,
           suggest_direction =>  suggested_direction
@@ -121,6 +126,10 @@ begin
       current_state <= next_state;
 
       -- NOTE: this the timer logic
+
+      if current_state = S_DOOR_OPEN and door_timer = 0 then
+        door_timer <= 2;
+      end if;
 
       if enable = '1' then -- NOTE: enable is coming from the clock divider every 1 sec
         case current_state is
@@ -146,6 +155,14 @@ begin
               door_timer <= door_timer - 1;
             end if;
 
+          when S_CHECK_REQUESTS =>
+            if move_timer = 0 then
+              move_timer <= 2;
+            elsif door_timer = 0 then
+
+
+            end if;
+
           when others =>
             move_timer <= 0;
             door_timer <= 0;
@@ -165,6 +182,7 @@ begin
     moving_down_reg <= '0';
     door_open <= '0';
     is_idle <= '0';
+    request_done <= '0';
 
     case current_state is
       when S_IDLE =>
@@ -186,13 +204,13 @@ begin
 
       when S_MOVING_UP =>
         moving_up_reg <= '1';
-        if move_timer = 0 then
+        if move_timer = 0 and current_floor_reg = target_floor_reg then
           next_state <= S_CHECK_REQUESTS;
         end if;
 
       when S_MOVING_DOWN =>
         moving_down_reg <= '1';
-        if move_timer = 0 then
+        if move_timer = 0 and current_floor_reg = target_floor_reg then
           next_state <= S_CHECK_REQUESTS;
         end if;
 
@@ -209,6 +227,7 @@ begin
       when S_DOOR_CLOSING =>
         door_open <= '0';
         next_state <= S_CHECK_REQUESTS;
+        request_done <= '1';
 
     end case;
   end process;
