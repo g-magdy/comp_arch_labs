@@ -43,7 +43,7 @@ architecture rtl of elevator_ctrl is
   signal suggested_direction : std_logic;
   signal enable              : std_logic;
   signal request_done : std_logic;
-  -- FIX: those ared added for can't read an output error in compile
+  -- FIX: those are added for can't read an output error in compile
   signal moving_up_reg       : std_logic;
   signal moving_down_reg     : std_logic;
 
@@ -120,7 +120,7 @@ begin
       current_state <= S_IDLE;
       current_floor_reg <= (others => '0');
       move_timer <= 0;
-      door_timer <= 0;
+      door_timer <= 2;
 
     elsif rising_edge(clk) then
       current_state <= next_state;
@@ -128,7 +128,7 @@ begin
       -- NOTE: this the timer logic
 
       if current_state = S_DOOR_OPEN and door_timer = 0 then
-        door_timer <= 2;
+        -- door_timer <= 2;
       end if;
 
       if enable = '1' then -- NOTE: enable is coming from the clock divider every 1 sec
@@ -143,7 +143,7 @@ begin
                 current_floor_reg <= current_floor_reg - 1;
               end if;
               
-              move_timer <= 2;
+              move_timer <= 1;
             else
               move_timer <= move_timer - 1;
             end if;
@@ -157,15 +157,14 @@ begin
 
           when S_CHECK_REQUESTS =>
             if move_timer = 0 then
-              move_timer <= 2;
-            elsif door_timer = 0 then
-
-
+              move_timer <= 1;
+            -- elsif door_timer = 0 then
+            --   door_timer <= 2;
             end if;
 
           when others =>
             move_timer <= 0;
-            door_timer <= 0;
+            door_timer <= 2;
 
         end case;
       end if;
@@ -192,7 +191,7 @@ begin
         end if;
 
       when S_CHECK_REQUESTS =>
-        if request_valid = '0' then
+        if request_valid = '0' or request_done ='1'then
           next_state <= S_IDLE;
         elsif current_floor_reg = target_floor_reg then
           next_state <= S_DOOR_OPENING;
@@ -220,6 +219,7 @@ begin
 
       when S_DOOR_OPEN =>
         door_open <= '1';
+        request_done <= '1';
         if door_timer = 0 then
           next_state <= S_DOOR_CLOSING;
         end if;
@@ -227,7 +227,6 @@ begin
       when S_DOOR_CLOSING =>
         door_open <= '0';
         next_state <= S_CHECK_REQUESTS;
-        request_done <= '1';
 
     end case;
   end process;
