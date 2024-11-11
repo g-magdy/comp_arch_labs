@@ -39,6 +39,14 @@ architecture testbench of elevator_ctrl_tb is
     constant between_tests_delay : time := 5000 ns;
     constant move_one_floor_time : time := 2000 ns;
 
+    procedure print_report is
+        begin
+            report "current_floor=" & integer'image(to_integer(current_floor)) & 
+                   " open=" & std_logic'image(door_open) & 
+                   " mv_up=" & std_logic'image(moving_up) & 
+                   " mv_dn=" & std_logic'image(moving_down) severity note;
+        end procedure;
+
 begin
     -- Instantiate the Unit Under Test (UUT)
     uut: elevator_ctrl
@@ -81,7 +89,7 @@ begin
         wait for request_setup_time;
         floor_request <= "0000000000"; -- reset request
         wait for move_one_floor_time * 1.2;
-        report "open="&std_logic'image(door_open)&" mv_up="&std_logic'image(moving_up)&" mv_dn="&std_logic'image(moving_down) severity note;
+        print_report;
         if (current_floor = to_unsigned(1, 4) and moving_up = '0' 
         and moving_down = '0' and door_open = '1') then
             report "1 Pass";
@@ -96,7 +104,7 @@ begin
         wait for request_setup_time;
         floor_request <= "0000000000"; -- reset request
         wait for move_one_floor_time * 3.6;
-        report "open="&std_logic'image(door_open)&" mv_up="&std_logic'image(moving_up)&" mv_dn="&std_logic'image(moving_down) severity note;
+        print_report;
         if (current_floor = to_unsigned(5, 4) and moving_up = '0' 
         and moving_down = '0' and door_open = '1') then
             report "2 Pass";
@@ -111,7 +119,7 @@ begin
         wait for request_setup_time;
         floor_request <= "0000000000"; -- reset request
         wait for move_one_floor_time * 2.6;
-        report "open="&std_logic'image(door_open)&" mv_up="&std_logic'image(moving_up)&" mv_dn="&std_logic'image(moving_down) severity note;
+        print_report;
         if (current_floor = to_unsigned(2, 4) and moving_up = '0' 
         and moving_down = '0' and door_open = '1') then
             report "3 Pass";
@@ -126,7 +134,7 @@ begin
         wait for request_setup_time;
         floor_request <= "0000000000"; -- reset request
         wait for move_one_floor_time * 2.5; -- to reach floor 4
-        report "open="&std_logic'image(door_open)&" mv_up="&std_logic'image(moving_up)&" mv_dn="&std_logic'image(moving_down) severity note;
+        print_report;
         if (current_floor = to_unsigned(4, 4) and moving_up = '0' 
         and moving_down = '0' and door_open = '1') then
             report "4 Pass";
@@ -135,7 +143,7 @@ begin
         end if;
 
         wait for move_one_floor_time * 5.5; -- to reach floor 9
-        report "open="&std_logic'image(door_open)&" mv_up="&std_logic'image(moving_up)&" mv_dn="&std_logic'image(moving_down) severity note;
+        print_report;
         if (current_floor = to_unsigned(9, 4) and moving_up = '0' 
         and moving_down = '0' and door_open = '1') then
             report "5 Pass";
@@ -150,7 +158,7 @@ begin
         wait for request_setup_time;
         floor_request <= "0000000000"; -- reset request
         wait for move_one_floor_time * 2; -- to reach floor 7
-        report "open="&std_logic'image(door_open)&" mv_up="&std_logic'image(moving_up)&" mv_dn="&std_logic'image(moving_down) severity note;
+        print_report;
         if (current_floor = to_unsigned(7, 4) and moving_up = '0' 
         and moving_down = '0' and door_open = '1') then
             report "6 Pass";
@@ -159,7 +167,7 @@ begin
         end if;
 
         wait for move_one_floor_time * 4.5; -- to reach floor 3
-        report "open="&std_logic'image(door_open)&" mv_up="&std_logic'image(moving_up)&" mv_dn="&std_logic'image(moving_down) severity note;
+        print_report;
         if (current_floor = to_unsigned(3, 4) and moving_up = '0' 
         and moving_down = '0' and door_open = '1') then
             report "7 Pass";
@@ -168,7 +176,7 @@ begin
         end if;
 
         wait for move_one_floor_time * 4; -- to reach floor 3
-        report "open="&std_logic'image(door_open)&" mv_up="&std_logic'image(moving_up)&" mv_dn="&std_logic'image(moving_down) severity note;
+        print_report;
         if (current_floor = to_unsigned(0, 4) and moving_up = '0' 
         and moving_down = '0' and door_open = '1') then
             report "8 Pass";
