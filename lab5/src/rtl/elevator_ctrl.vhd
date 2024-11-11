@@ -131,6 +131,10 @@ begin
         -- door_timer <= 2;
       end if;
 
+      if current_state = S_DOOR_OPENING then
+        door_timer <= 2;
+      end if;
+
       if enable = '1' then -- NOTE: enable is coming from the clock divider every 1 sec
         case current_state is
 
@@ -158,9 +162,10 @@ begin
           when S_CHECK_REQUESTS =>
             if move_timer = 0 then
               move_timer <= 1;
-            -- elsif door_timer = 0 then
-            --   door_timer <= 2;
             end if;
+            -- if door_timer = 0 then
+            --   door_timer <= 2;
+            -- end if;
 
           when others =>
             move_timer <= 0;

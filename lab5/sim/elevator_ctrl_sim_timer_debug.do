@@ -47,5 +47,16 @@ force -freeze sim:/elevator_ctrl/floor_request 0000000000 0
 
 run 22500 ns
 
+force -freeze sim:/elevator_ctrl/floor_request 0000001000 0
+run 500 ns
+force -freeze sim:/elevator_ctrl/floor_request 0000000000 0
+
+run 30000 ns
+
+force -freeze sim:/elevator_ctrl/floor_request 0101000000 0
+run 500 ns
+force -freeze sim:/elevator_ctrl/floor_request 0000000000 0
+
+run 30000 ns
 
 wave zoom full
