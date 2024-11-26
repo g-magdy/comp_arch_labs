@@ -20,7 +20,15 @@ architecture testbench of elevator_ctrl_tb is
             current_floor : out unsigned(FLOOR_BITS - 1 downto 0);
             moving_up     : out std_logic;
             moving_down   : out std_logic;
-            door_open     : out std_logic
+            door_open     : out std_logic;
+
+            a_out         : out std_logic;
+            b_out         : out std_logic;
+            c_out         : out std_logic;
+            d_out         : out std_logic;
+            e_out         : out std_logic;
+            f_out         : out std_logic;
+            g_out         : out std_logic
         );
     end component;
 
@@ -32,6 +40,15 @@ architecture testbench of elevator_ctrl_tb is
     signal moving_up     : std_logic;
     signal moving_down   : std_logic;
     signal door_open     : std_logic;
+
+    signal a_out : std_logic;
+    signal b_out : std_logic;
+    signal c_out : std_logic;
+    signal d_out : std_logic;
+    signal e_out : std_logic;
+    signal f_out : std_logic;
+    signal g_out : std_logic;
+
 
     -- Clock period definition
     constant clk_period : time := 20 ns;
@@ -62,7 +79,16 @@ begin
             current_floor => current_floor,
             moving_up     => moving_up,
             moving_down   => moving_down,
-            door_open     => door_open
+            door_open     => door_open,
+
+            a_out => a_out, 
+            b_out => b_out,
+            c_out => c_out,
+            d_out => d_out,
+            e_out => e_out,
+            f_out => f_out,
+            g_out => g_out
+
         );
 
     -- Clock process definitions

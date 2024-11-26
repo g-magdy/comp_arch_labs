@@ -15,7 +15,14 @@ entity elevator_ctrl is
     current_floor : out unsigned(FLOOR_BITS - 1 downto 0);
     moving_up     : out std_logic;
     moving_down   : out std_logic;
-    door_open     : out std_logic
+    door_open     : out std_logic;
+    a_out         : out std_logic;
+    b_out         : out std_logic;
+    c_out         : out std_logic;
+    d_out         : out std_logic;
+    e_out         : out std_logic;
+    f_out         : out std_logic;
+    g_out         : out std_logic
   );
 end elevator_ctrl;
 
@@ -52,7 +59,7 @@ architecture rtl of elevator_ctrl is
   -- components
   component request_resolver is
       generic (
-          NUM_FLOORS  : integer := 10;
+          NUM_FLOORS  : integer := 5;
           FLOOR_BITS  : integer := 4
       );
       port (
@@ -72,7 +79,7 @@ architecture rtl of elevator_ctrl is
 
   component clock_divider is
       generic (
-          CLK_FREQ  : integer := 50_000_000
+          CLK_FREQ  : integer := 50
       );
       port (
           clk     : in  std_logic;
@@ -80,6 +87,21 @@ architecture rtl of elevator_ctrl is
           enable  : out std_logic
       );
   end component;
+
+  component binary_to_seven_seg is
+    port (
+      num : in std_logic_vector(3 downto 0);
+      a : out std_logic;
+      b : out std_logic;
+      c : out std_logic;
+      d : out std_logic;
+      e : out std_logic;
+      f : out std_logic;
+      g : out std_logic
+    ) ;
+  end component;
+  
+
 begin
 
   -- clock divider
@@ -240,5 +262,17 @@ begin
   current_floor <= current_floor_reg;
   moving_up <= moving_up_reg;
   moving_down <= moving_down_reg;
+
+  binary_to_seven_segment: binary_to_seven_seg
+    port map (
+      num => std_logic_vector(current_floor_reg),
+      a => a_out,
+      b => b_out,
+      c => c_out,
+      d => d_out,
+      e => e_out,
+      f => f_out,
+      g => g_out
+    );
 
 end architecture rtl;

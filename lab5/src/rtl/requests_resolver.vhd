@@ -34,8 +34,8 @@ architecture Behavioral of request_resolver is
     -- Function to check if there are any requests above current floor
     function has_requests_above(requests: std_logic_vector; curr_floor: integer) return boolean is
     begin
-        for i in curr_floor + 1 to requests'high loop
-            if requests(i) = '1' then
+        for i in 0 to NUM_FLOORS-1 loop
+            if i > curr_floor and requests(i) = '1' then
                 return true;
             end if;
         end loop;
@@ -45,8 +45,8 @@ architecture Behavioral of request_resolver is
     -- Function to check if there are any requests below current floor
     function has_requests_below(requests: std_logic_vector; curr_floor: integer) return boolean is
     begin
-        for i in 0 to curr_floor - 1 loop
-            if requests(i) = '1' then
+        for i in 0 to NUM_FLOORS-1 loop
+            if i < curr_floor and requests(i) = '1' then
                 return true;
             end if;
         end loop;
@@ -57,8 +57,9 @@ architecture Behavioral of request_resolver is
     function find_next_up_request(requests: std_logic_vector; curr_floor: integer) 
     return integer is
     begin
-        for i in curr_floor + 1 to requests'high loop
-            if requests(i) = '1' then
+        -- for i in curr_floor + 1 to requests'high loop
+        for i in 0 to NUM_FLOORS - 1 loop
+            if i > curr_floor and requests(i) = '1' then
                 return i;
             end if;
         end loop;
@@ -69,8 +70,8 @@ architecture Behavioral of request_resolver is
     function find_next_down_request(requests: std_logic_vector; curr_floor: integer) 
     return integer is
     begin
-        for i in curr_floor - 1 downto 0 loop
-            if requests(i) = '1' then
+        for i in NUM_FLOORS - 1 downto 0 loop
+            if i < curr_floor and requests(i) = '1' then
                 return i;
             end if;
         end loop;
@@ -119,8 +120,8 @@ begin
                 elsif moving_up = '1' or is_idle = '1' then
                     if has_requests_above(request_reg, current_floor_int) then
                         -- Find next request above
-                        for i in current_floor_int + 1 to NUM_FLOORS-1 loop
-                            if request_reg(i) = '1' then
+                        for i in 0 to NUM_FLOORS-1 loop
+                            if i > current_floor_int and request_reg(i) = '1' then
                                 target_floor_reg <= to_unsigned(i, FLOOR_BITS);
                                 request_valid_reg <= '1';
                                 suggested_dir_up_reg <= '1';
@@ -129,8 +130,8 @@ begin
                         end loop;
                     elsif has_requests_below(request_reg, current_floor_int) then
                         -- Find next request below
-                        for i in current_floor_int - 1 downto 0 loop
-                            if request_reg(i) = '1' then
+                        for i in NUM_FLOORS - 1 downto 0 loop
+                            if i < current_floor_int and request_reg(i) = '1' then
                                 target_floor_reg <= to_unsigned(i, FLOOR_BITS);
                                 request_valid_reg <= '1';
                                 suggested_dir_up_reg <= '0';
@@ -143,8 +144,8 @@ begin
                 else
                     if has_requests_below(request_reg, current_floor_int) then
                         -- Find next request below
-                        for i in current_floor_int - 1 downto 0 loop
-                            if request_reg(i) = '1' then
+                        for i in NUM_FLOORS - 1 downto 0 loop
+                            if i < current_floor_int and request_reg(i) = '1' then
                                 target_floor_reg <= to_unsigned(i, FLOOR_BITS);
                                 request_valid_reg <= '1';
                                 suggested_dir_up_reg <= '0';
@@ -153,8 +154,8 @@ begin
                         end loop;
                     elsif has_requests_above(request_reg, current_floor_int) then
                         -- Find next request above
-                        for i in current_floor_int + 1 to NUM_FLOORS-1 loop
-                            if request_reg(i) = '1' then
+                        for i in 0 to NUM_FLOORS-1 loop
+                            if i > current_floor_int and request_reg(i) = '1' then
                                 target_floor_reg <= to_unsigned(i, FLOOR_BITS);
                                 request_valid_reg <= '1';
                                 suggested_dir_up_reg <= '1';
